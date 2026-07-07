@@ -1,39 +1,40 @@
 import type { CSSProperties } from 'react'
 
 export const editableRootStyle = {
-  // Yelp-style system: clean white surfaces, signature red accent, hairline
-  // gray borders, near-black text. Flat (no gradients), generous and premium.
+  // Clean SaaS-editorial system: white surfaces, near-black type, violet accent
+  // for CTAs / links, hairline gray borders, a soft lavender wash for section
+  // hero backdrops. Minimal, generous, product-lp feel.
   '--slot4-page-bg': '#ffffff',
-  '--slot4-page-text': '#1a1a1a',
-  '--slot4-panel-bg': '#f7f7f7',
+  '--slot4-page-text': '#0f1222',
+  '--slot4-panel-bg': '#f4f5f8',
   '--slot4-surface-bg': '#ffffff',
-  '--slot4-muted-text': '#6b6b6b',
-  '--slot4-soft-muted-text': '#999999',
-  '--slot4-accent': '#d32323',
-  '--slot4-accent-fill': '#d32323',
-  '--slot4-accent-soft': '#fdecec',
+  '--slot4-muted-text': '#5b6172',
+  '--slot4-soft-muted-text': '#8b93a7',
+  '--slot4-accent': '#4a5cff',
+  '--slot4-accent-fill': '#4a5cff',
+  '--slot4-accent-soft': '#eef0ff',
   '--slot4-on-accent': '#ffffff',
-  '--slot4-dark-bg': '#1a1a1a',
+  '--slot4-dark-bg': '#0f1222',
   '--slot4-dark-text': '#ffffff',
-  '--slot4-media-bg': '#eeeeee',
+  '--slot4-media-bg': '#eef1f7',
   '--slot4-cream': '#ffffff',
-  '--slot4-warm': '#f7f7f7',
-  '--slot4-lavender': '#ffffff',
-  '--slot4-gray': '#f7f7f7',
+  '--slot4-warm': '#f7f8fb',
+  '--slot4-lavender': '#e9eafc',
+  '--slot4-gray': '#f4f5f8',
   '--slot4-body-gradient': 'none',
   '--editable-page-bg': '#ffffff',
-  '--editable-page-text': '#1a1a1a',
-  '--editable-container': '1500px',
-  '--editable-border': '#e6e6e6',
+  '--editable-page-text': '#0f1222',
+  '--editable-container': '1400px',
+  '--editable-border': '#e6e8ee',
   '--editable-nav-bg': '#ffffff',
-  '--editable-nav-text': '#1a1a1a',
-  '--editable-nav-active': '#d32323',
+  '--editable-nav-text': '#0f1222',
+  '--editable-nav-active': '#4a5cff',
   '--editable-nav-active-text': '#ffffff',
-  '--editable-cta-bg': '#d32323',
+  '--editable-cta-bg': '#4a5cff',
   '--editable-cta-text': '#ffffff',
   '--editable-search-bg': '#ffffff',
-  '--editable-footer-bg': '#ffffff',
-  '--editable-footer-text': '#1a1a1a',
+  '--editable-footer-bg': '#f4f5f8',
+  '--editable-footer-text': '#0f1222',
 } as CSSProperties
 
 export const editablePalette = {
@@ -88,9 +89,9 @@ export const editableDesignContract = {
     dark: `rounded-xl ${editablePalette.darkBg} ${editablePalette.darkText} ${editablePalette.shadowStrong}`,
   },
   button: {
-    primary: `inline-flex items-center justify-center gap-2 rounded-lg bg-[var(--slot4-accent-fill)] px-6 py-3 text-sm font-bold tracking-[0.01em] text-[var(--slot4-on-accent)] transition duration-200 hover:brightness-95 active:scale-[0.98]`,
-    secondary: `inline-flex items-center justify-center gap-2 rounded-lg border border-[var(--editable-border)] bg-[var(--slot4-surface-bg)] px-6 py-3 text-sm font-bold tracking-[0.01em] text-[var(--slot4-page-text)] transition duration-200 hover:border-[var(--slot4-accent)] hover:text-[var(--slot4-accent)] active:scale-[0.98]`,
-    accent: `inline-flex items-center justify-center gap-2 rounded-lg ${editablePalette.accentBg} px-6 py-3 text-sm font-bold text-[var(--slot4-on-accent)] transition duration-200 hover:brightness-95 active:scale-[0.98]`,
+    primary: `inline-flex items-center justify-center gap-2 rounded-full bg-[var(--slot4-accent-fill)] px-7 py-3.5 text-xs font-bold uppercase tracking-[0.18em] text-[var(--slot4-on-accent)] transition duration-200 hover:brightness-105 hover:-translate-y-0.5 hover:shadow-[0_10px_30px_rgba(74,92,255,0.35)] active:scale-[0.98]`,
+    secondary: `inline-flex items-center justify-center gap-2 rounded-full border border-[var(--editable-border)] bg-[var(--slot4-surface-bg)] px-7 py-3.5 text-xs font-bold uppercase tracking-[0.18em] text-[var(--slot4-page-text)] transition duration-200 hover:border-[var(--slot4-accent)] hover:text-[var(--slot4-accent)] active:scale-[0.98]`,
+    accent: `inline-flex items-center justify-center gap-2 rounded-full ${editablePalette.accentBg} px-7 py-3.5 text-xs font-bold uppercase tracking-[0.18em] text-[var(--slot4-on-accent)] transition duration-200 hover:brightness-105 hover:-translate-y-0.5 hover:shadow-[0_10px_30px_rgba(74,92,255,0.35)] active:scale-[0.98]`,
   },
   media: {
     frame: `relative overflow-hidden rounded-xl ${editablePalette.mediaBg}`,

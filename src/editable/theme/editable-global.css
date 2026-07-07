@@ -97,9 +97,64 @@ body {
 }
 
 ::selection {
-  background: color-mix(in oklab, var(--slot4-accent-fill) 28%, transparent);
-  color: var(--slot4-page-text);
+  background: var(--slot4-accent, #d32323);
+  color: #ffffff;
 }
+::-moz-selection {
+  background: var(--slot4-accent, #d32323);
+  color: #ffffff;
+}
+
+/* Endless marquee-style slider used on homepage rails */
+@keyframes editable-marquee {
+  0% { transform: translate3d(0, 0, 0); }
+  100% { transform: translate3d(-50%, 0, 0); }
+}
+.editable-marquee {
+  display: flex;
+  gap: 1.25rem;
+  width: max-content;
+  animation: editable-marquee 38s linear infinite;
+  will-change: transform;
+}
+.editable-marquee-wrap:hover .editable-marquee { animation-play-state: paused; }
+.editable-marquee-wrap {
+  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 6%, #000 94%, transparent 100%);
+          mask-image: linear-gradient(90deg, transparent 0, #000 6%, #000 94%, transparent 100%);
+  overflow: hidden;
+}
+
+@keyframes editable-float-y {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+.editable-float { animation: editable-float-y 6s ease-in-out infinite; }
+
+@keyframes editable-hero-fade {
+  from { opacity: 0; transform: translate3d(0, 30px, 0); }
+  to   { opacity: 1; transform: none; }
+}
+.editable-hero-in > * { animation: editable-hero-fade 0.9s var(--ease-premium) both; }
+.editable-hero-in > *:nth-child(2) { animation-delay: 0.12s; }
+.editable-hero-in > *:nth-child(3) { animation-delay: 0.24s; }
+.editable-hero-in > *:nth-child(4) { animation-delay: 0.36s; }
+.editable-hero-in > *:nth-child(5) { animation-delay: 0.48s; }
+
+@keyframes editable-glow-pan {
+  0%, 100% { background-position: 0% 50%; }
+  50%      { background-position: 100% 50%; }
+}
+.editable-gradient-glow {
+  background: linear-gradient(120deg, var(--slot4-accent), color-mix(in oklab, var(--slot4-accent) 55%, #6b1010), var(--slot4-accent));
+  background-size: 200% 200%;
+  animation: editable-glow-pan 12s ease-in-out infinite;
+}
+
+@keyframes editable-card-tilt {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50%      { transform: translateY(-6px) rotate(-0.3deg); }
+}
+.editable-tilt-card { animation: editable-card-tilt 8s ease-in-out infinite; }
 
 ::-webkit-scrollbar-track {
   background: color-mix(in oklab, var(--slot4-page-bg) 88%, black);
