@@ -9,6 +9,7 @@ import { SITE_CONFIG, type TaskKey } from '@/lib/site-config'
 import type { SitePost } from '@/lib/site-connector'
 import { EditableSiteShell } from '@/editable/shell/EditableSiteShell'
 import { pagesContent } from '@/editable/content/pages.content'
+import { Ads } from '@/lib/ads'
 
 export const revalidate = 3
 
@@ -126,16 +127,38 @@ export default async function SearchPage({ searchParams }: { searchParams?: Prom
             <Link href="/article" className="inline-flex items-center gap-2 rounded-full border border-[var(--editable-border)] bg-white px-5 py-3 text-sm font-black">Browse latest <ArrowRight className="h-4 w-4" /></Link>
           </div>
 
+          <div className="mx-auto mt-8 max-w-6xl">
+            <Ads slot="header" showLabel eager className="mx-auto w-full" />
+          </div>
+
           {results.length ? (
-            <div className="mt-6 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-              {results.map((post, index) => <SearchResultCard key={post.id || post.slug} post={post} index={index} />)}
-            </div>
+            <>
+              <div className="mt-6 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+                {results.slice(0, Math.ceil(results.length / 2)).map((post, index) => <SearchResultCard key={post.id || post.slug} post={post} index={index} />)}
+              </div>
+              {results.length > 6 ? (
+                <div className="mx-auto my-10 max-w-6xl">
+                  <Ads slot="in-feed" showLabel className="mx-auto w-full" />
+                </div>
+              ) : null}
+              {results.length > Math.ceil(results.length / 2) ? (
+                <div className="mt-6 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+                  {results.slice(Math.ceil(results.length / 2)).map((post, index) => <SearchResultCard key={post.id || post.slug} post={post} index={index + Math.ceil(results.length / 2)} />)}
+                </div>
+              ) : null}
+            </>
           ) : (
             <div className="mt-8 rounded-[2rem] border border-dashed border-[var(--editable-border)] bg-white/70 p-10 text-center">
               <p className="text-2xl font-black tracking-[-0.04em]">No matching posts found.</p>
               <p className="mt-3 text-sm font-semibold opacity-60">Try a different keyword, task type, or category.</p>
             </div>
           )}
+
+          {!results.length ? (
+            <div className="mx-auto mt-10 max-w-6xl">
+              <Ads slot="article-bottom" showLabel className="mx-auto w-full" />
+            </div>
+          ) : null}
         </section>
       </main>
     </EditableSiteShell>

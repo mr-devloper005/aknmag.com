@@ -9,6 +9,18 @@ import { taskPageMetadata } from '@/config/site.content'
 import { taskPageVoices } from '@/editable/content/task-pages.content'
 import { EditableSiteShell } from '@/editable/shell/EditableSiteShell'
 import { getTaskTheme, taskThemeStyle } from '@/editable/theme/task-themes'
+import { Ads } from '@/lib/ads'
+
+// Two ads per task page; different slot combos across tasks for variety.
+const taskAdMix: Record<TaskKey, [Parameters<typeof Ads>[0]['slot'], Parameters<typeof Ads>[0]['slot']]> = {
+  article:    ['header', 'in-feed'],
+  listing:    ['in-feed', 'article-bottom'],
+  classified: ['header', 'sidebar'],
+  image:      ['header', 'footer'],
+  sbm:        ['in-feed', 'sidebar'],
+  pdf:        ['header', 'article-bottom'],
+  profile:    ['sidebar', 'footer'],
+}
 
 export const revalidate = 3
 
@@ -92,6 +104,7 @@ export function TaskArchiveView({ task, posts, pagination, category, basePath }:
   const page = pagination.page || 1
   const label = taskConfig?.label || task
   const categoryLabel = category === 'all' ? 'All categories' : CATEGORY_OPTIONS.find((item) => item.slug === category)?.name || category
+  const [adTop] = taskAdMix[task] || (['header'] as const)
 
   return (
     <EditableSiteShell>
@@ -138,6 +151,10 @@ export function TaskArchiveView({ task, posts, pagination, category, basePath }:
             </div>
           </div>
         </header>
+
+        <div className="mx-auto max-w-6xl px-4 py-6">
+          <Ads slot={adTop} showLabel eager className="mx-auto w-full" />
+        </div>
 
         <section className="mx-auto max-w-[var(--editable-container)] px-6 py-16 sm:py-20 lg:px-8">
           {posts.length ? (
