@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { ArrowLeft, ArrowUpRight, Bookmark, Building2, Camera, CheckCircle2, Download, ExternalLink, FileText, Globe2, Mail, MapPin, Phone, Star, Tag, UserRound } from 'lucide-react'
+import { ArrowLeft, ArrowUpRight, Bookmark, Building2, Camera, CheckCircle2, Clock3, Download, ExternalLink, FileText, Globe2, Mail, MapPin, Phone, Star, Tag, UserRound } from 'lucide-react'
 import { buildPostMetadata, buildTaskMetadata } from '@/lib/seo'
 import { fetchArticleComments, fetchTaskPostBySlug, fetchTaskPosts } from '@/lib/task-data'
 import { getTaskConfig, SITE_CONFIG, type TaskKey } from '@/lib/site-config'
@@ -8,6 +8,17 @@ import type { SitePost } from '@/lib/site-connector'
 import { EditableSiteShell } from '@/editable/shell/EditableSiteShell'
 import { EditableArticleComments } from '@/editable/components/EditableArticleComments'
 import { getTaskTheme, taskThemeStyle } from '@/editable/theme/task-themes'
+import { Ads } from '@/lib/ads'
+
+const detailAdMix: Record<TaskKey, [Parameters<typeof Ads>[0]['slot'], Parameters<typeof Ads>[0]['slot']]> = {
+  article:    ['header', 'article-bottom'],
+  listing:    ['sidebar', 'footer'],
+  classified: ['in-feed', 'article-bottom'],
+  image:      ['header', 'sidebar'],
+  sbm:        ['in-feed', 'footer'],
+  pdf:        ['header', 'in-feed'],
+  profile:    ['sidebar', 'article-bottom'],
+}
 
 export const revalidate = 3
 
@@ -114,9 +125,13 @@ const mapSrcFor = (post: SitePost) => {
 }
 
 export function TaskDetailView({ task, post, related, comments = [] }: { task: TaskKey; post: SitePost; related: SitePost[]; comments?: Array<{ id: string; name: string; comment: string; createdAt: string }> }) {
+  const [adTop] = detailAdMix[task] || (['header'] as const)
   return (
     <EditableSiteShell>
       <main style={taskThemeStyle(task)} className="min-h-screen bg-[var(--tk-bg)] text-[var(--tk-text)]">
+        <div className="mx-auto max-w-6xl px-4 py-6">
+          <Ads slot={adTop} showLabel eager className="mx-auto w-full" />
+        </div>
         {task === 'listing' ? <ListingDetail post={post} related={related} /> : null}
         {task === 'classified' ? <ClassifiedDetail post={post} related={related} /> : null}
         {task === 'image' ? <ImageDetail post={post} related={related} /> : null}
@@ -189,21 +204,62 @@ function BackLink({ task }: { task: TaskKey }) {
   )
 }
 
-// ----- Article: a quiet, centred reading column -----
+// ----- Article: magazine-style reading layout with a sticky share/info rail -----
 function ArticleDetail({ post, related, comments }: { post: SitePost; related: SitePost[]; comments: Array<{ id: string; name: string; comment: string; createdAt: string }> }) {
   const images = getImages(post)
+  const category = categoryOf(post, 'Article')
+  const lead = leadText(post)
+  const wordCount = stripHtml(getBody(post)).split(/\s+/).filter(Boolean).length
+  const readMins = Math.max(1, Math.round(wordCount / 200))
+  const authorInitial = SITE_CONFIG.name.trim().charAt(0).toUpperCase()
+
   return (
     <>
-      <article className="mx-auto max-w-4xl px-6 py-14 sm:py-20">
-        <BackLink task="article" />
-        <p className="mt-10 text-xs font-medium uppercase tracking-[0.28em] text-[var(--tk-accent)]">{categoryOf(post, 'Article')}</p>
-        <h1 className="editable-display mt-5 text-balance text-4xl font-semibold leading-[1.06] tracking-[-0.03em] sm:text-5xl lg:text-[3.4rem]">{post.title}</h1>
-        <div className="mt-6 text-sm text-[var(--tk-muted)]">
-          <span>{SITE_CONFIG.name}</span>
+      <article className="mx-auto max-w-[var(--editable-container)] px-6 py-14 sm:py-20 lg:px-8">
+        <div className="mx-auto max-w-4xl">
+          <p className="inline-flex items-center rounded-full bg-[var(--tk-accent-soft)] px-3.5 py-1.5 text-[11px] font-bold uppercase tracking-[0.24em] text-[var(--tk-accent)]">
+            {category}
+          </p>
+          <h1 className="editable-display mt-6 text-balance text-4xl font-semibold leading-[1.05] tracking-[-0.03em] sm:text-5xl lg:text-[3.4rem]">{post.title}</h1>
+          {lead ? <p className="mt-6 max-w-3xl text-xl leading-9 text-[var(--tk-muted)]">{lead}</p> : null}
+          <div className="mt-7 flex flex-wrap items-center gap-4 border-y border-[var(--tk-line)] py-4 text-sm text-[var(--tk-muted)]">
+            <span className="inline-flex items-center gap-2.5">
+              <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[var(--tk-accent)] text-xs font-bold text-white">{authorInitial}</span>
+              <span className="font-semibold text-[var(--tk-text)]">{SITE_CONFIG.name}</span>
+            </span>
+            <span className="hidden h-1 w-1 rounded-full bg-[var(--tk-muted)] opacity-50 sm:inline-block" />
+            <span className="inline-flex items-center gap-1.5"><Clock3 className="h-4 w-4" /> {readMins} min read</span>
+          </div>
         </div>
-        {images[0] ? <img src={images[0]} alt="" className="mt-10 aspect-[16/9] w-full rounded-[var(--tk-radius)] border border-[var(--tk-line)] object-cover" /> : null}
-        <BodyContent post={post} />
-        <EditableArticleComments slug={post.slug} comments={comments} />
+
+        <div className="mx-auto mt-10 grid max-w-6xl gap-10 lg:grid-cols-[minmax(0,1fr)_280px]">
+          <div className="min-w-0">
+            {images[0] ? <img src={images[0]} alt="" className="aspect-[16/9] w-full rounded-[var(--tk-radius)] border border-[var(--tk-line)] object-cover" /> : null}
+            <BodyContent post={post} />
+            {images.length > 1 ? <ImageStrip images={images.slice(1)} label="Gallery" /> : null}
+            <EditableArticleComments slug={post.slug} comments={comments} />
+          </div>
+
+          <aside className="space-y-6 lg:sticky lg:top-24 lg:self-start">
+            <div className="rounded-[var(--tk-radius)] border border-[var(--tk-line)] bg-[var(--tk-surface)] p-5">
+              <p className="text-xs font-bold uppercase tracking-[0.2em] text-[var(--tk-muted)]">At a glance</p>
+              <div className="mt-4 grid gap-2.5 text-sm">
+                <p className="flex items-center gap-2"><Tag className="h-4 w-4 text-[var(--tk-accent)]" /> {category}</p>
+                <p className="flex items-center gap-2"><Clock3 className="h-4 w-4 text-[var(--tk-accent)]" /> {readMins} min read</p>
+                <p className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-[var(--tk-accent)]" /> {SITE_CONFIG.name}</p>
+              </div>
+            </div>
+
+            {related.length ? (
+              <div className="rounded-[var(--tk-radius)] border border-[var(--tk-line)] bg-[var(--tk-surface)] p-5">
+                <h2 className="editable-display text-base font-semibold tracking-[-0.01em]">More to read</h2>
+                <div className="mt-4 space-y-4">
+                  {related.slice(0, 3).map((item) => <RelatedCard key={item.id || item.slug} task="article" post={item} />)}
+                </div>
+              </div>
+            ) : null}
+          </aside>
+        </div>
       </article>
       <RelatedStrip task="article" related={related} />
     </>
@@ -221,8 +277,7 @@ function ListingDetail({ post, related }: { post: SitePost; related: SitePost[] 
   const mapSrc = mapSrcFor(post)
   return (
     <section className="mx-auto max-w-[var(--editable-container)] px-6 py-14 sm:py-20 lg:px-8">
-      <BackLink task="listing" />
-      <div className="mt-8 grid gap-10 lg:grid-cols-[minmax(0,1fr)_380px]">
+      <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_380px]">
         <article className="min-w-0">
           <div className="flex flex-col gap-6 sm:flex-row sm:items-center">
             <div className="flex h-28 w-28 shrink-0 items-center justify-center overflow-hidden rounded-[var(--tk-radius)] border border-[var(--tk-line)] bg-[var(--tk-raised)]">
@@ -494,7 +549,7 @@ function BadgeLine({ label, value }: { label: string; value: string }) {
   )
 }
 
-function RelatedPanel({ task, post, related }: { task: TaskKey; post: SitePost; related: SitePost[] }) {
+function RelatedPanel({ task, related }: { task: TaskKey; post: SitePost; related: SitePost[] }) {
   const taskConfig = getTaskConfig(task)
   return (
     <div className="space-y-6">
